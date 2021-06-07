@@ -90,6 +90,11 @@ function checkWinner(gameboardObject) {
         return ('O Wins!')
     }
 
+    else if ((binaryArray.reduce((a,b)=>a+b,0)<=5)) {
+        gameboardObject.gameEnd = true
+        return 'Its a Draw!'
+    }
+
     else {return ''}
 }
 
