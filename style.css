@@ -1,12 +1,18 @@
+body {
+    background-color: #dad873;
+    font-family: 'Odibee Sans', cursive;
+    color: #454d66;
+    font-size: 30px;
+}
+
 .info {
-    margin-left: 45vw;
-    margin-top: 50px;
+    text-align: center;
 }
 
 .gameboard {
+    
     margin-left: 40vw;
     margin-top: 50px;
-    font-family: 'Odibee Sans', cursive;
     font-size:30px;
     text-transform: uppercase;
     display: grid;
@@ -16,8 +22,13 @@
 }
 
 .square {
+    background-color: #efeeb4;
     border:1px solid black;
     padding: 2px;
     text-align: center;
     padding-top: 10px;
+}
+
+.square:hover {
+    background-color: #c4c394;
 }

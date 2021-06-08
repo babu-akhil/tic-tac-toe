@@ -1,8 +1,10 @@
 const gameboardObject = (() => {
     let gameboardArray = new Array(9);
     let nextTurn = 'X';
+    let firstMove = true;
     let gameEnd = false;
-    return {gameboardArray, nextTurn, gameEnd}
+    let notDraw = false;
+    return {gameboardArray, firstMove,nextTurn, gameEnd, notDraw};
 })();
 
 function arraysEqual(a, b) {
@@ -26,28 +28,41 @@ gameboardObject.gameboardArray.fill('')
 
 function updateDisplay(gameboardObject) {
     let info = Array.from(document.getElementsByClassName('info'))[0]
-    info.innerText = 'Next Move: ' + gameboardObject.nextTurn
+    if(!gameboardObject.gameEnd) {info.innerText = 'Next Move: ' + gameboardObject.nextTurn
+    console.log('grrr')}
     let squares = Array.from(document.getElementsByClassName('square'))
     squares.forEach(item => {
         item.innerText = gameboardObject.gameboardArray[parseInt(item.id)]
     })
-    console.log(squares)
 }
 
 function mark(gameboardObject) {
     let squares = Array.from(document.getElementsByClassName('square'))
+    
     squares.forEach(item => {
         item.addEventListener('click', () => {
+            if (gameboardObject.firstMove) {
+                squares.forEach(square => {
+                    square.style.backgroundColor = '#efeeb4';
+                    console.log('brr')
+                })
+            }
+            if (gameboardObject.gameboardArray.includes('X') || gameboardObject.gameboardArray.includes('O'))
+                {
+                    gameboardObject.firstMove = false
+                }
             if(gameboardObject.gameboardArray[parseInt(item.id)]==='') {
             gameboardObject.gameboardArray[parseInt(item.id)] = gameboardObject.nextTurn
             gameboardObject.nextTurn = gameboardObject.nextTurn==='X'?'O':'X'
             console.log(item.id)
-            updateDisplay(gameboardObject)
+            
             let winnerOutput = checkWinner(gameboardObject)
-            console.log(winnerOutput)
+            updateDisplay(gameboardObject)
+            console.log(gameboardObject.gameEnd)
             if(gameboardObject.gameEnd ===true) {console.log('Game Over!')
                 gameboardObject.gameboardArray.fill('')
                 gameboardObject.gameEnd = false
+                gameboardObject.notDraw = false;
                 }
             }
         })
@@ -56,48 +71,55 @@ function mark(gameboardObject) {
 }
 
 function checkWinner(gameboardObject) {
+    let info = Array.from(document.getElementsByClassName('info'))[0]
+
     let binaryArray = []
     gameboardObject.gameboardArray.forEach(item => {
         if (item==='X') {binaryArray.push(1)}
         else if (item==='O') {binaryArray.push(0)}
         else if(item==='') {binaryArray.push(999)}
     })
+    let squares = Array.from(document.getElementsByClassName('square'))
 
-    if  ((binaryArray[0]+binaryArray[1]+binaryArray[2]===3)
-    ||(binaryArray[3]+binaryArray[4]+binaryArray[5]===3)
-    ||((binaryArray[6]+binaryArray[7]+binaryArray[8]===3))
-    ||(binaryArray[0]+binaryArray[3]+binaryArray[6]===3)
-    ||(binaryArray[1]+binaryArray[4]+binaryArray[7]===3)
-    ||(binaryArray[2]+binaryArray[5]+binaryArray[8]===3)
-    ||(binaryArray[0]+binaryArray[4]+binaryArray[8]===3)
-    ||(binaryArray[2]+binaryArray[4]+binaryArray[6]===3)
-     ) {
-        gameboardObject.gameEnd = true
-        return ('X Wins!')
+    let winningCombinations = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
+    winningCombinations.forEach(([i,j,k]) => {
+        if  (binaryArray[i]+binaryArray[j]+binaryArray[k]===3)
+    {   let winningSquares = squares.filter(square => square.id == String(i)||square.id == String(j)||square.id == String(k))
         
+        winningSquares.forEach(square => {
+            square.style.backgroundColor = '#58b368';
+        })
+        gameboardObject.gameEnd = true;
+        gameboardObject.firstMove = true;
+        info.innerText = 'X Wins!';
+        gameboardObject.notDraw = true;
+        return 'X Wins!';
     }
+    })
 
-    if  ((binaryArray[0]+binaryArray[1]+binaryArray[2]===0)
-    ||(binaryArray[3]+binaryArray[4]+binaryArray[5]===0)
-    ||((binaryArray[6]+binaryArray[7]+binaryArray[8]===0))
-    ||(binaryArray[0]+binaryArray[3]+binaryArray[6]===0)
-    ||(binaryArray[1]+binaryArray[4]+binaryArray[7]===0)
-    ||(binaryArray[2]+binaryArray[5]+binaryArray[8]===0)
-    ||(binaryArray[0]+binaryArray[4]+binaryArray[8]===0)
-    ||(binaryArray[2]+binaryArray[4]+binaryArray[6]===0)
-     ) {
-        gameboardObject.gameEnd = true
-        return ('O Wins!')
+    winningCombinations.forEach(([i,j,k]) => {
+        if  (binaryArray[i]+binaryArray[j]+binaryArray[k]===0)
+    {   let winningSquares = squares.filter(square => square.id == String(i)||square.id == String(j)||square.id == String(k))
+        
+        winningSquares.forEach(square => {
+            square.style.backgroundColor = '#58b368';
+        })
+        gameboardObject.gameEnd = true;
+        gameboardObject.firstMove = true;
+        gameboardObject.notDraw = true;
+        info.innerText = 'O Wins!';
+        return 'O Wins!'
     }
-
-    else if ((binaryArray.reduce((a,b)=>a+b,0)<=5)) {
-        gameboardObject.gameEnd = true
+    })
+    if ((binaryArray.reduce((a,b)=>a+b,0)<=5) && !gameboardObject.notDraw) {
+        gameboardObject.gameEnd = true;
+        gameboardObject.firstMove = true;
+        info.innerText =  'Its a Draw!'
         return 'Its a Draw!'
     }
 
     else {return ''}
 }
-
 
 
 mark(gameboardObject)
